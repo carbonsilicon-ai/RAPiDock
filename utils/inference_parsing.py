@@ -93,7 +93,7 @@ def get_parser():
     parser.add_argument(
         "--batch_size",
         type=int,
-        default=None,
+        default=10,
         help="The batch size used in inference process",
     )
     parser.add_argument(
@@ -127,7 +127,7 @@ def get_parser():
     parser.add_argument(
         "--cpu",
         type=int,
-        default=5,
+        default=10,
         help="The cpu used in inference process",
     )
     return parser

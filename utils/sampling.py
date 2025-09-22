@@ -30,6 +30,7 @@ def sampling(data_list, model, args, inference_steps =20,
         new_data_list = []
 
         for complex_graph_batch in loader:
+            print(t_idx, 'complex_graph_batch')
             b = complex_graph_batch.num_graphs
             
             tr_sigma, rot_sigma, tor_backbone_sigma, tor_sidechain_sigma = noise_schedule(t_tr, t_rot, t_tor_backbone, t_tor_sidechain)

@@ -4,8 +4,12 @@ ckpt: rapidock_local.pt
 scoring_function: ref2015
 confidence_ckpt: null
 confidence_model_dir: null
-batch_size: 4
+batch_size: 40  # Batch size for sampling within each complex
+gpu_batch_size: 1  # Number of complexes to process together in GPU batch
 no_final_step_noise: true
 inference_steps: 16
-actual_steps: 16
+actual_steps: 16  # Can be reduced for faster inference (e.g., 8-12)
 conformation_partial: '1:1:1'
+cpu: 16
+disable_parallel_processing: false  # Set to true to use original sequential processing
+fast_mode: false  # Enable to reduce actual_steps by half for faster inference

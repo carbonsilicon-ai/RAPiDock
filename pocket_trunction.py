@@ -137,39 +137,40 @@ def pocket_trunction(
     return len([res for res in protein_structure.get_residues()]), len(pocket_residues)
 
 
-parser = argparse.ArgumentParser()
-parser.add_argument(
-    "--protein_path", type=str, default=None, help="Path to the protein file"
-)
-parser.add_argument(
-    "--peptide_path", type=str, default=None, help="Path to the peptide file"
-)
-parser.add_argument(
-    "--xyz", nargs="+", type=float, default=None, help="Center of pocket"
-)
-parser.add_argument("--threshold", type=float, default=None, help="Cutoff threshold")
-parser.add_argument(
-    "--save_name", type=str, default=None, help="Path to the output protein file"
-)
-parser.add_argument("--level", type=str, default=None, help="Chain or Residue")
-parser.add_argument(
-    "--exclude_chain", nargs="+", type=str, default=None, help="Chain excluded"
-)
-parser.add_argument(
-    "--threshold_keep",
-    type=float,
-    default=5,
-    help="Cutoff threshold for keeping chains even they are included in exclude_chain",
-)
-args = parser.parse_args()
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--protein_path", type=str, default=None, help="Path to the protein file"
+    )
+    parser.add_argument(
+        "--peptide_path", type=str, default=None, help="Path to the peptide file"
+    )
+    parser.add_argument(
+        "--xyz", nargs="+", type=float, default=None, help="Center of pocket"
+    )
+    parser.add_argument("--threshold", type=float, default=None, help="Cutoff threshold")
+    parser.add_argument(
+        "--save_name", type=str, default=None, help="Path to the output protein file"
+    )
+    parser.add_argument("--level", type=str, default=None, help="Chain or Residue")
+    parser.add_argument(
+        "--exclude_chain", nargs="+", type=str, default=None, help="Chain excluded"
+    )
+    parser.add_argument(
+        "--threshold_keep",
+        type=float,
+        default=5,
+        help="Cutoff threshold for keeping chains even they are included in exclude_chain",
+    )
+    args = parser.parse_args()
 
-pocket_trunction(
-    args.protein_path,
-    args.peptide_path,
-    args.threshold,
-    args.save_name,
-    args.xyz,
-    args.level,
-    args.exclude_chain,
-    args.threshold_keep,
-)
+    pocket_trunction(
+        args.protein_path,
+        args.peptide_path,
+        args.threshold,
+        args.save_name,
+        args.xyz,
+        args.level,
+        args.exclude_chain,
+        args.threshold_keep,
+    )

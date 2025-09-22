@@ -1,3 +1,9 @@
 complex_name,protein_description,peptide_description,
 7BBG,data/7bbg/7bbg_protein_pocket.pdb,data/7bbg/7bbg_peptide.pdb,
 7BBG_sequence,data/7bbg/7bbg_protein_pocket.pdb,RMFPNAPYL,
+7BBG_2,data/7bbg/7bbg_protein_pocket.pdb,RMFPNAPYL,
+7BBG_3,data/7bbg/7bbg_protein_pocket.pdb,RMFPNAPYL,
+7BBG_4,data/7bbg/7bbg_protein_pocket.pdb,RMFPNAPYL,
+7BBG_5,data/7bbg/7bbg_protein_pocket.pdb,RMFPNAPYL,
+7BBG_6,data/7bbg/7bbg_protein_pocket.pdb,RMFPNAPYL,
+7BBG_7,data/7bbg/7bbg_protein_pocket.pdb,RMFPNAPYL

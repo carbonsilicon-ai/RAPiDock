@@ -25,6 +25,8 @@ from utils.inference_utils import InferenceDataset, set_nones
 from utils.peptide_updater import randomize_position
 from utils.sampling import sampling
 import multiprocessing
+import time
+
 
 warnings.filterwarnings("ignore")
 
@@ -113,7 +115,7 @@ def prepare_data_list(original_complex_graph, N):
 def save_predictions(write_dir, predict_pos, original_complex_graph, args, confidence):
     raw_pdb = MDAnalysis.Universe(StringIO(original_complex_graph["pep"].noh_mda), format="pdb")
     peptide_unrelaxed_files = []
-    
+    print('confidence', confidence, args)
     re_order = None
     # reorder predictions based on confidence output
     if confidence is not None:
@@ -164,11 +166,14 @@ def process_complex(model, confidence_model, score_model_args, args, original_co
     randomize_position(data_list, False, score_model_args.tr_sigma_max)
 
     visualization_list = None
-    if args.save_visualisation:
-        visualization_list = [
-            np.asarray([g["pep_a"].pos.cpu().numpy() + original_complex_graph.original_center.cpu().numpy() for g in data_list])
-        ]
+    # if args.save_visualisation:
+    #     visualization_list = [
+    #         np.asarray([g["pep_a"].pos.cpu().numpy() + original_complex_graph.original_center.cpu().numpy() for g in data_list])
+    #     ]
 
+    print('len data_list', len(data_list), args.batch_size)
+
+    start_time = time.time()
     data_list, confidence, visualization_list = sampling(
         data_list=data_list,
         model=model,
@@ -184,6 +189,7 @@ def process_complex(model, confidence_model, score_model_args, args, original_co
         visualization_list=visualization_list,
         confidence_model=confidence_model,
     )
+    print(f"Sampling time: {time.time() - start_time} seconds")
 
     predict_pos = np.asarray(
         [
@@ -194,7 +200,9 @@ def process_complex(model, confidence_model, score_model_args, args, original_co
     )
 
     # save predictions
+    start_time = time.time()
     re_order = save_predictions(write_dir, predict_pos, original_complex_graph, args, confidence)
+    print(f"Save predictions time: {time.time() - start_time} seconds")
 
     # save visualisation frames
     if args.save_visualisation:

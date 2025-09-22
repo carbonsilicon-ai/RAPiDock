@@ -1,0 +1,14 @@
+.DS_Store
+.vscode
+.idea
+*.pyc
+*.pt
+*/__pycache__/*
+*/*.pyc
+*.npy
+results/*
+outputs/*
+datasets/*
+testdataset/*
+eval_*
+unit_test_*
