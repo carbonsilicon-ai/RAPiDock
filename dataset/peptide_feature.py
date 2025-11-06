@@ -7,13 +7,6 @@
 
 import math
 import numpy as np
-import torch
-from torch_scatter import scatter_max,scatter_min
-from utils.PeptideBuilder import get_edges_from_sequence
-import torch.nn.functional as F
-import torch_cluster
-from MDAnalysis.analysis import distances
-from utils.dataset_utils import read_pdb_with_seq, three_to_one, standard_residue_sort
 from io import StringIO
 import MDAnalysis
 from rdkit.Chem import AllChem, RemoveHs
@@ -21,6 +14,14 @@ from rdkit import Chem
 from rdkit.Chem import AllChem
 import warnings
 import os
+import torch
+from torch_scatter import scatter_max,scatter_min
+import torch.nn.functional as F
+import torch_cluster
+from MDAnalysis.analysis import distances
+from ..utils.PeptideBuilder import get_edges_from_sequence
+from ..utils.dataset_utils import read_pdb_with_seq, three_to_one, standard_residue_sort
+
 
 three2idx = {k:v for v, k in enumerate(['GLY', 'ALA', 'VAL', 'LEU', 'ILE', 'PRO', 'PHE', 'TYR', 
 										'TRP', 'SER', 'THR', 'CYS', 'MET', 'ASN', 'GLN', 'ASP', 

@@ -16,10 +16,11 @@ from torch_geometric.utils import to_networkx
 import networkx as nx
 import numpy as np
 from esm import FastaBatchedDataset, pretrained
-from utils.dataset_utils import three_to_one, standard_residue_sort, get_sequences
-from dataset.protein_feature import get_protein_feature_mda
-from dataset.peptide_feature import get_ori_peptide_feature_mda
-from utils.PeptideBuilder import make_structure_from_sequence
+from ..dataset.protein_feature import get_protein_feature_mda
+from ..dataset.peptide_feature import get_ori_peptide_feature_mda
+from .dataset_utils import three_to_one, standard_residue_sort, get_sequences
+from .PeptideBuilder import make_structure_from_sequence
+
 
 def set_nones(l):
     return [s if str(s) != 'nan' else None for s in l]
@@ -29,6 +30,7 @@ Dihedral_angle = {
     'Extended' : [-139,135],
     'Polyproline' : [-78,149]
 }
+
 
 def compute_ESM_embeddings(model, alphabet, labels, sequences):
     # settings used

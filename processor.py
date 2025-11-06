@@ -27,19 +27,18 @@ import torch
 import yaml
 from argparse import Namespace
 from torch_geometric.loader import DataListLoader
-from utils.inference_utils import InferenceDataset
-from utils.utils import get_model, ExponentialMovingAverage
-
 from argparse import Namespace
 import yaml
 
 # Import RAPiDock modules
-from pocket_trunction import pocket_trunction
-from inference_optimized import main as inference_main
-from utils.inference_parsing import get_parser
-from dataset.peptide_feature import three2idx, three2self
-from inference_optimized import main_sequential_with_data
-from inference_optimized import main_optimized_with_data
+from .utils.inference_utils import InferenceDataset
+from .utils.utils import get_model, ExponentialMovingAverage
+from .pocket_trunction import pocket_trunction
+from .inference_optimized import main as inference_main
+from .utils.inference_parsing import get_parser
+from .dataset.peptide_feature import three2idx, three2self
+from .inference_optimized import main_sequential_with_data
+from .inference_optimized import main_optimized_with_data
 
 warnings.filterwarnings("ignore")
 
@@ -874,17 +873,18 @@ def main(protein=None,
          peptides=None,
          reference_peptide=None,
          docking_position=None,
-         threshold=20.0,
-         level="Chain",
+         threshold=12.0,
+         level="Residue",
          min_length=3,
          max_length=50,
          output="results/",
          work_dir=None,
          keep_temp=False,
-         config="default_inference_args.yaml",
+         config="/workdir/default_inference_args.yaml",
          n_samples=10,
          batch_size=40,
-         cpu=16):
+         cpu=16
+    ):
     """
     Main entry point for the protein-peptide docking processor.
     
@@ -1011,10 +1011,6 @@ def main(protein=None,
         print(f"{'='*60}")
         print(f"Results directory: {output}")
         print(f"Working directory: {work_dir}")
-        
-        if not keep_temp:
-            print("Cleaning up temporary files...")
-            shutil.rmtree(work_dir)
         
         # Prepare detailed peptide information
         peptide_info = []

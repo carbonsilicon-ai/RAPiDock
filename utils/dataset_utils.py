@@ -5,12 +5,12 @@
 # Created Time: Tue 24 Oct 2023 01:47:39 PM CST
 #########################################################################
 
-
-from rdkit import Chem
-import MDAnalysis
-from utils.PeptideBuilder import get_edges_from_sequence
 import re
 from Bio.PDB import PDBParser
+from rdkit import Chem
+import MDAnalysis
+from .PeptideBuilder import get_edges_from_sequence
+
 
 
 def standard_residue_sort(item):

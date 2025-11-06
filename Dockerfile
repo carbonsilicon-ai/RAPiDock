@@ -43,5 +43,6 @@ RUN /opt/miniconda/envs/RAPiDock/bin/pip install /tmp/pyrosetta-2025.33+release.
 COPY esm2_t33_650M_UR50D-contact-regression.pt /root/.cache/torch/hub/checkpoints/esm2_t33_650M_UR50D-contact-regression.pt
 COPY esm2_t33_650M_UR50D.pt /root/.cache/torch/hub/checkpoints/esm2_t33_650M_UR50D.pt
 
-WORKDIR /app
-COPY . /app
+WORKDIR /workdir
+
+

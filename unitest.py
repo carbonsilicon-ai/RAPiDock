@@ -22,9 +22,9 @@ from datetime import datetime
 # Add current directory to Python path to import local modules
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
-from inference_optimized import main as inference_main
-from utils.inference_parsing import get_parser
-from rmsd_bound_pyrosetta import rmsd as calculate_rmsd
+from .inference_optimized import main as inference_main
+from .utils.inference_parsing import get_parser
+from .rmsd_bound_pyrosetta import rmsd as calculate_rmsd
 
 # Fixed list of 21 protein complexes for unit testing
 UNIT_TEST_COMPLEXES = [

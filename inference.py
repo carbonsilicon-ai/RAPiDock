@@ -19,11 +19,11 @@ from io import StringIO
 from argparse import Namespace
 from MDAnalysis.coordinates.memory import MemoryReader
 from torch_geometric.loader import DataListLoader
-from utils.inference_parsing import get_parser
-from utils.utils import get_model, ExponentialMovingAverage
-from utils.inference_utils import InferenceDataset, set_nones
-from utils.peptide_updater import randomize_position
-from utils.sampling import sampling
+from .utils.inference_parsing import get_parser
+from .utils.utils import get_model, ExponentialMovingAverage
+from .utils.inference_utils import InferenceDataset, set_nones
+from .utils.peptide_updater import randomize_position
+from .utils.sampling import sampling
 import multiprocessing
 import time
 

@@ -6,11 +6,12 @@
 #########################################################################
 
 import torch
+import time
 import numpy as np
 from torch_geometric.loader import DataLoader
-from utils.diffusion_utils import get_t_schedule, set_time, NoiseSchedule
-from utils.peptide_updater import peptide_updater
-import time
+from .diffusion_utils import get_t_schedule, set_time, NoiseSchedule
+from .peptide_updater import peptide_updater
+
 
 def sampling_optimized(data_list, model, args, inference_steps=20,
                       no_random=False, ode=False, visualization_list=None, 

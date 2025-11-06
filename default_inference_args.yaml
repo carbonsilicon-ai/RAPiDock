@@ -1,5 +1,5 @@
 N: 10
-model_dir: train_models/CGTensorProductEquivariantModel
+model_dir: /workdir/train_models/CGTensorProductEquivariantModel
 ckpt: rapidock_local.pt
 scoring_function: ref2015
 confidence_ckpt: null

@@ -16,7 +16,7 @@ import torch_cluster
 import MDAnalysis
 from scipy.spatial import distance_matrix
 from MDAnalysis.analysis import distances
-from utils.dataset_utils import standard_residue_sort
+from ..utils.dataset_utils import standard_residue_sort
 
 three2idx = {
     k: v

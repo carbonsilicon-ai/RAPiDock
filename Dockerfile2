@@ -1,5 +1,11 @@
 # basic image
-FROM rapidock:v3
+# FROM rapidock:v3
 
-COPY esm2_t33_650M_UR50D-contact-regression.pt /root/.cache/torch/hub/checkpoints/esm2_t33_650M_UR50D-contact-regression.pt
-COPY esm2_t33_650M_UR50D.pt /root/.cache/torch/hub/checkpoints/esm2_t33_650M_UR50D.pt
+# COPY esm2_t33_650M_UR50D-contact-regression.pt /root/.cache/torch/hub/checkpoints/esm2_t33_650M_UR50D-contact-regression.pt
+# COPY esm2_t33_650M_UR50D.pt /root/.cache/torch/hub/checkpoints/esm2_t33_650M_UR50D.pt
+
+FROM rapidock:v6
+
+COPY default_inference_args.yaml /workdir/default_inference_args.yaml
+COPY train_models/ /workdir/train_models/
+COPY *.npy /workdir/

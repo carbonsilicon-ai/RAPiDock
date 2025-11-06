@@ -32,20 +32,26 @@ def residues_saver(structure, residues, out_name, verbose=0):
 def pocket_trunction(
     protein,
     peptide=None,
-    threshold=20.0,
+    threshold=20.0,  # 12
     save_name=None,
     xyz=None,
-    level="Chain",
+    level="Chain",  # residue
     exclude_chain=None,
     threshold_keep=5.0,
 ):
     # Load Peptide Structures
+    if xyz is not None:
+        if isinstance(xyz[0], list):
+            peptide_coords = np.array(xyz)
+        else:
+            peptide_coords = [np.array(xyz)]
+
     if peptide is not None:
         parser = PDBParser()
         peptide_structure = parser.get_structure("peptide", peptide)
         peptide_coords = [atom.get_coord() for atom in peptide_structure.get_atoms()]
-    if xyz is not None:
-        peptide_coords = [np.array(xyz)]
+    
+    print('@@@@@!!@@@@@peptide_coords', peptide_coords, flush=True)
 
     other_chain = set(exclude_chain) if exclude_chain is not None else {}
 
@@ -69,7 +75,7 @@ def pocket_trunction(
     pocket_chains_far = {residue.get_parent() for residue in pocket_residues_far}
     pocket_chains_near = {residue.get_parent() for residue in pocket_residues_near}
 
-    pocket_residues = []
+    pocket_residues = set()
     if level == "Residue":
         pocket_residue_list_far = [
             [
@@ -98,7 +104,7 @@ def pocket_trunction(
                 if chain == chain_id:
                     for residue in chain.get_residues():
                         if res_id_min <= residue.get_full_id()[-1][1] <= res_id_max:
-                            pocket_residues.append(residue)
+                            pocket_residues.add(residue)
         for _ in pocket_residue_list_far:
             if (_[0].get_parent().id in other_chain) and (
                 _[0].get_parent() in list(pocket_chains_near)
@@ -113,23 +119,26 @@ def pocket_trunction(
                 if chain == chain_id:
                     for residue in chain.get_residues():
                         if res_id_min <= residue.get_full_id()[-1][1] <= res_id_max:
-                            pocket_residues.append(residue)
+                            pocket_residues.add(residue)
 
     elif level == "Chain":
         for chain in protein_structure.get_chains():
             if chain in list(pocket_chains_near):
                 for residue in chain.get_residues():
-                    pocket_residues.append(residue)
+                    pocket_residues.add(residue)
             if (
                 (chain in list(pocket_chains_far))
                 and (chain.id not in other_chain)
                 and (chain not in list(pocket_chains_near))
             ):
                 for residue in chain.get_residues():
-                    pocket_residues.append(residue)
+                    pocket_residues.add(residue)
 
     elif level == "Atom":
-        pocket_residues = list(pocket_residues_far) + list(pocket_residues_near)
+        pocket_residues = set(list(pocket_residues_far) + list(pocket_residues_near))
+    
+    # Convert set to list for saving
+    pocket_residues = list(pocket_residues)
 
     # (Optional): save the pocket resides
     if save_name:

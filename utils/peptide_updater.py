@@ -9,7 +9,7 @@ import copy
 import torch
 import numpy as np
 from scipy.spatial.transform import Rotation
-from utils.geometry import kabsch_torch, axis_angle_to_matrix
+from .geometry import kabsch_torch, axis_angle_to_matrix
 
 def peptide_updater(data, tr_update, rot_update, torsion_backbone_updates, torsion_sidechain_updates):
     pep_a_center = torch.mean(data['pep_a'].pos, dim=0, keepdim=True)
