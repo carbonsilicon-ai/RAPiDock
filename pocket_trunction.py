@@ -20,6 +20,70 @@ class PocketResidueSelect(Select):
 
     def accept_residue(self, residue):
         return residue in self.residues
+    
+    def accept_atom(self, atom):
+        # Filter out hydrogen atoms
+        return atom.element != 'H'
+
+
+def clean_pdb_structure(pdb_file_path: str, output_path: str = None) -> bool:
+    """
+    Clean PDB structure by removing residues with incomplete backbone atoms.
+    This is necessary after pocket extraction to avoid Rosetta errors.
+    
+    Args:
+        pdb_file_path: Path to input PDB file
+        output_path: Path to output cleaned PDB file (if None, overwrites input)
+        
+    Returns:
+        True if cleaning was successful, False otherwise
+    """
+    if output_path is None:
+        output_path = pdb_file_path
+    
+    try:
+        parser = PDBParser(QUIET=True)
+        structure = parser.get_structure('protein', pdb_file_path)
+        
+        class CompleteResidueSelect(Select):
+            """Only select residues with complete backbone atoms (N, CA, C, O)"""
+            def accept_residue(self, residue):
+                # Skip heteroatoms and water
+                if residue.id[0] != ' ':
+                    return False
+                
+                # Check for backbone atoms
+                required_atoms = {'N', 'CA', 'C', 'O'}
+                atom_names = {atom.name for atom in residue.get_atoms()}
+                
+                # Return True only if all required backbone atoms are present
+                return required_atoms.issubset(atom_names)
+            
+            def accept_atom(self, atom):
+                # Filter out hydrogen atoms
+                return atom.element != 'H'
+        
+        # Count residues before and after
+        total_residues = sum(1 for _ in structure.get_residues())
+        
+        # Save cleaned structure
+        io = PDBIO()
+        io.set_structure(structure)
+        io.save(output_path, CompleteResidueSelect())
+        
+        # Count cleaned residues
+        cleaned_structure = parser.get_structure('cleaned', output_path)
+        cleaned_residues = sum(1 for _ in cleaned_structure.get_residues())
+        
+        removed = total_residues - cleaned_residues
+        if removed > 0:
+            print(f"PDB cleaning: removed {removed} incomplete residues ({cleaned_residues}/{total_residues} retained)")
+        
+        return True
+        
+    except Exception as e:
+        print(f"Error cleaning PDB structure: {e}")
+        return False
 
 
 def residues_saver(structure, residues, out_name, verbose=0):
@@ -28,6 +92,7 @@ def residues_saver(structure, residues, out_name, verbose=0):
     pdbio.save(out_name, PocketResidueSelect(residues))
     if verbose:
         print("residues saved at {}".format(out_name))
+
 
 def pocket_trunction(
     protein,
@@ -38,6 +103,7 @@ def pocket_trunction(
     level="Chain",  # residue
     exclude_chain=None,
     threshold_keep=5.0,
+    clean_pdb=True,
 ):
     # Load Peptide Structures
     if xyz is not None:
@@ -49,7 +115,8 @@ def pocket_trunction(
     if peptide is not None:
         parser = PDBParser()
         peptide_structure = parser.get_structure("peptide", peptide)
-        peptide_coords = [atom.get_coord() for atom in peptide_structure.get_atoms()]
+        # Filter out hydrogen atoms
+        peptide_coords = [atom.get_coord() for atom in peptide_structure.get_atoms() if atom.element != 'H']
     
     print('@@@@@!!@@@@@peptide_coords', peptide_coords, flush=True)
 
@@ -60,8 +127,9 @@ def pocket_trunction(
         parser = PDBParser()
         protein_structure = parser.get_structure("protein", protein)
 
-    # Extract pocket residues
-    ns = NeighborSearch(list(protein_structure.get_atoms()))
+    # Extract pocket residues (filter out hydrogen atoms)
+    protein_atoms = [atom for atom in protein_structure.get_atoms() if atom.element != 'H']
+    ns = NeighborSearch(protein_atoms)
     pocket_residues_far = {
         res.get_parent()
         for coord in peptide_coords
@@ -143,6 +211,9 @@ def pocket_trunction(
     # (Optional): save the pocket resides
     if save_name:
         residues_saver(protein_structure, pocket_residues, save_name)
+        # Clean the saved PDB structure to remove incomplete residues
+        if clean_pdb:
+            clean_pdb_structure(save_name)
     return len([res for res in protein_structure.get_residues()]), len(pocket_residues)
 
 
