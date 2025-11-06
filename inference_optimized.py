@@ -29,6 +29,7 @@ from .utils.utils import get_model, ExponentialMovingAverage
 from .utils.inference_utils import InferenceDataset, set_nones
 from .utils.peptide_updater import randomize_position
 from .utils.sampling import sampling
+from .utils.pyrosetta_utils import relax_score
 
 warnings.filterwarnings("ignore")
 
@@ -134,7 +135,6 @@ def save_predictions_async(write_dir, predict_pos, original_complex_graph, args,
         raw_pdb.atoms.write(peptide_unrelaxed_file)
 
     if args.scoring_function == "ref2015" or args.fastrelax:
-        from utils.pyrosetta_utils import relax_score
         relaxed_poses = [peptide.replace(".pdb", "_relaxed.pdb") for peptide in peptide_unrelaxed_files]
         protein_raw_file = f"{write_dir}/{os.path.basename(write_dir)}_protein_raw.pdb"
 

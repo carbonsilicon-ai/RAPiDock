@@ -8,4 +8,4 @@ FROM rapidock:v6
 
 COPY default_inference_args.yaml /workdir/default_inference_args.yaml
 COPY train_models/ /workdir/train_models/
-COPY *.npy /workdir/
+COPY .*.npy /workdir/
