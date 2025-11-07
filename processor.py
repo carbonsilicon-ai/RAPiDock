@@ -680,7 +680,7 @@ def process_results(output_dir: str,
                 complex_result['scores']['error'] = str(e)
         
         # Run DockQ evaluation for reference peptide re-docking
-        if result_dir == 'reference_redocking' and reference_peptide and protein_pdb and enable_reference_evaluation:
+        if result_dir == 'reference_redocking' and reference_peptide and protein_pdb:
             print(f"  Running DockQ evaluation against reference for all ranks...")
             
             # Evaluate all ranked models and get the best result
