@@ -39,6 +39,7 @@ from .utils.inference_parsing import get_parser
 from .dataset.peptide_feature import three2idx, three2self
 from .inference_optimized import main_sequential_with_data
 from .inference_optimized import main_optimized_with_data
+from .utils.dataset_utils import three_to_one
 
 warnings.filterwarnings("ignore")
 
@@ -52,6 +53,36 @@ STANDARD_AA = {
     'M': 'MET', 'N': 'ASN', 'Q': 'GLN', 'D': 'ASP', 'E': 'GLU', 'K': 'LYS',
     'R': 'ARG', 'H': 'HIS'
 }
+
+def extract_sequence_from_pdb(pdb_file: str) -> Optional[str]:
+    """
+    Extract peptide sequence from PDB file.
+    
+    Args:
+        pdb_file: Path to PDB file
+        
+    Returns:
+        Peptide sequence string (supports both single-letter codes and [XXX] format)
+        Returns None if extraction fails
+    """
+    if not MDANALYSIS_AVAILABLE:
+        print(f"Warning: MDAnalysis not available. Cannot extract sequence from {pdb_file}")
+        return None
+        
+    try:
+        u = MDAnalysis.Universe(pdb_file)
+        seq = []
+        for residue in u.residues:
+            res_name = residue.resname.strip()
+            if res_name in three_to_one:
+                seq.append(three_to_one[res_name])
+            else:
+                # Use [XXX] format for non-standard residues
+                seq.append(f'[{res_name}]')
+        return ''.join(seq)
+    except Exception as e:
+        print(f"Error extracting sequence from {pdb_file}: {e}")
+        return None
 
 def classify_capri_peptide(fnat, iRMS, lRMS):
     """
@@ -555,6 +586,15 @@ def process_results(output_dir: str,
         for i, seq in enumerate(peptide_sequences):
             peptide_mapping[f'peptide_{i+1:03d}'] = seq
     
+    # Extract sequence from reference peptide PDB file if provided
+    if reference_peptide and os.path.exists(reference_peptide):
+        ref_sequence = extract_sequence_from_pdb(reference_peptide)
+        if ref_sequence:
+            peptide_mapping['reference_redocking'] = ref_sequence
+            print(f"Extracted reference peptide sequence: {ref_sequence}")
+        else:
+            print(f"Warning: Could not extract sequence from reference peptide: {reference_peptide}")
+    
     for result_dir in sorted(result_dirs):
         result_path = os.path.join(output_dir, result_dir)
         print(f"\nProcessing results for: {result_dir}")
@@ -640,7 +680,7 @@ def process_results(output_dir: str,
                 complex_result['scores']['error'] = str(e)
         
         # Run DockQ evaluation for reference peptide re-docking
-        if result_dir == 'reference_redocking' and reference_peptide and protein_pdb:
+        if result_dir == 'reference_redocking' and reference_peptide and protein_pdb and enable_reference_evaluation:
             print(f"  Running DockQ evaluation against reference for all ranks...")
             
             # Evaluate all ranked models and get the best result
@@ -721,7 +761,8 @@ def run_inference_directly(protein_pdb: str,
                          config: str = "default_inference_args.yaml",
                          n_samples: int = 10,
                          batch_size: int = 40,
-                         cpu: int = 16) -> None:
+                         cpu: int = 16,
+                         enable_reference_evaluation: bool = False) -> None:
     """
     Run inference directly without creating CSV files.
     
@@ -742,7 +783,7 @@ def run_inference_directly(protein_pdb: str,
     peptide_description_list = []
     
     # Add reference peptide for re-docking if provided
-    if reference_peptide:
+    if reference_peptide and enable_reference_evaluation:
         complex_name_list.append('reference_redocking')
         protein_description_list.append(protein_pdb)
         peptide_description_list.append(reference_peptide)
@@ -883,7 +924,8 @@ def main(protein=None,
          config="/workdir/default_inference_args.yaml",
          n_samples=10,
          batch_size=40,
-         cpu=16
+         cpu=16,
+         enable_reference_evaluation=False
     ):
     """
     Main entry point for the protein-peptide docking processor.
@@ -993,7 +1035,8 @@ def main(protein=None,
             config=config,
             n_samples=n_samples,
             batch_size=batch_size,
-            cpu=cpu
+            cpu=cpu,
+            enable_reference_evaluation=enable_reference_evaluation
         )
         
         # Step 4: Process results
@@ -1081,6 +1124,7 @@ def main(protein=None,
                     
                     output_results['reference_peptide_results'] = {
                         'description': f"Reference peptide re-docking from: {reference_peptide}",
+                        'peptide_sequence': result['peptide_info']['sequence'],
                         'file_path': reference_peptide,
                         'complex_name': result['complex_name'],
                         'result_path': result['result_path'],
@@ -1324,7 +1368,8 @@ if __name__ == "__main__":
         protein='data/7bbg/7bbg_protein_pocket.pdb',
         peptides=['RMFPNAPYL', 'HKILHRLLQDS'],
         reference_peptide='data/7bbg/7bbg_peptide.pdb',
-        output='results/test_run/'
+        output='results/test_run/',
+        enable_reference_evaluation=True
     )
 
     print('\n' + "=" * 80)
